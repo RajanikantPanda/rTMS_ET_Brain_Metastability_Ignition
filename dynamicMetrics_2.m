@@ -13,11 +13,11 @@ function [meta, sync_all, dFC, dFC_cos, integ, Q] = dynamicMetrics(ts,delta)
     %Basic filtering parameters
     %%%%%%%%%%%%%
 
-     flp = .03;   %flp = .01;  0.03; .008;      % lowpass frequency of filter
-     fhi = .07;   %fhi = .09;  0.08; .09;       % highpass
-     k = 2;                  % 2nd order butterworth filter
+     flp = .03;               % lowpass frequency of filter
+     fhi = .07;               % highpass
+     k = 2;                   % 2nd order butterworth filter
      fnq = 1/(2*delta);       % Nyquist frequency
-     Wn = [flp/fnq fhi/fnq]; % butterworth bandpass non-dimensional frequency
+     Wn = [flp/fnq fhi/fnq];  % butterworth bandpass non-dimensional frequency
      [bfilt2,afilt2] = butter(k,Wn);   % construct the filter
 
 
