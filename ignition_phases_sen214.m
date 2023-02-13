@@ -47,8 +47,8 @@ for cond=1:3   %to run in Intrensic ignition measures for each group
 
   FC = zeros(NSUB,N,N);
 
-  flp = 0.03;   %0.04     % lowpass frequency of filter
-  fhi = 0.08;   %0.07     % highpass
+  flp = 0.03;             % lowpass frequency of filter
+  fhi = 0.07;             % highpass
   delt = TR;              % sampling interval
   k = 2;                  % 2nd order butterworth filter
   fnq = 1/(2*delt);       % Nyquist frequency
