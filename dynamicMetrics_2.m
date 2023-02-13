@@ -1,11 +1,12 @@
-%Function that calculates the metastability, dFC as well as whole-brain
+%Function that calculates the metastability, dFC, FCD as well as whole-brain
 %integration and segregation (Q) for a given time series across subjects.
 %Inputs are the time series arranged within a cell-array with dimensions:
 %1 x numberOFSubjects and delta is the TR of the sample. 
 %numberOFSubjects musd be 'ROIs x TimeSeries' format
 %Victor Saenger, 2018. UPF, Barcelona.
 
-function [meta, sync_all, dFC, dFC_cos, integ, Q] = dynamicMetrics(ts,delta)
+
+function [meta, sync_all, dFC, dFC_cos, integ, Q, CDC,matrix_CDC] = dynamicMetrics(ts,delta)
 
     NSUB = length(ts);
     N = size(ts{1},1);
@@ -62,8 +63,7 @@ function [meta, sync_all, dFC, dFC_cos, integ, Q] = dynamicMetrics(ts,delta)
       for i = 1:N
         for j = 1:N
          dM(i,j,t) = exp(-3*adif(Phases(i,t),Phases(j,t)));  % computes dynamic matrix/ dFC
-         dM_cos(i,j,t)=cos(Phases(i,t)-Phases(j,t)); %dM/dFC/phasematrix all same 
-         %phasematrix(i,j)=abs(x(i,t)-x(j,t));
+         dM_cos(i,j,t)=cos(Phases(i,t)-Phases(j,t)); %computes dynamic matrix/ dFC using cos function
         end
       end 
       
@@ -90,13 +90,35 @@ function [meta, sync_all, dFC, dFC_cos, integ, Q] = dynamicMetrics(ts,delta)
       %should get a value closer to -1
       [~, Q(nsub,t)] = community_louvain(abs(dM(:,:,t)));
      end
+     
+     
+        %% FCD (phases)
+        Isubdiag = find(tril(ones(N,N),-1));
+        for t=T
+            patt=dM_cos(:,:,t);
+            pattern(t,:)=patt(Isubdiag);
+        end
+        npattmax=size(pattern,1);
+        kk3=1;
+        for t=1:npattmax-30
+            p1=mean(pattern(t:t+30,:));
+            for t2=t+1:npattmax-30
+                p2=mean(pattern(t2:t2+30,:));
+                phfcddata(kk3)=dot(p1,p2)/norm(p1)/norm(p2);
+                matrixcdc(t,t2)=dot(p1,p2)/norm(p1)/norm(p2);
+                matrixcdc(t2,t)=dot(p1,p2)/norm(p1)/norm(p2);
+                kk3=kk3+1;
+            end
+        end 
+        CDC(nsub,:)=phfcddata;
+        matrix_CDC(nsub,:,:)=matrixcdc;
+        %%   
+     
     display(nsub);
     dFC{nsub} = dM; 
     dFC_cos{nsub} = dM_cos; 
     end
 end
 
-
-   
    
    
